@@ -1,0 +1,4 @@
+/home/zyh/Desktop/计算机系统性能测试/作业2/gettimeofday/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/zyh/Desktop/计算机系统性能测试/作业2/gettimeofday/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/zyh/Desktop/计算机系统性能测试/作业2/gettimeofday/cmake-build-debug/CMakeFiles/gettiemofday.dir
+/home/zyh/Desktop/计算机系统性能测试/作业2/gettimeofday/cmake-build-debug/CMakeFiles/rdtsc.dir

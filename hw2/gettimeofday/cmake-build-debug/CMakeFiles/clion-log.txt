@@ -1,0 +1,9 @@
+/usr/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/zyh/Desktop/计算机系统性能测试/作业2/gettimeofday
+-- Boost version: 1.65.1
+-- Found the following Boost libraries:
+--   date_time
+--   filesystem
+--   system
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/zyh/Desktop/计算机系统性能测试/作业2/gettimeofday/cmake-build-debug

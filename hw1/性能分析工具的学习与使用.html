@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>性能分析工具的学习与使用</title>
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+        
+        <style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        
+        
+    </head>
+    <body class="vscode-light">
+        <h1 id="%e6%80%a7%e8%83%bd%e5%88%86%e6%9e%90%e5%b7%a5%e5%85%b7%e7%9a%84%e5%ad%a6%e4%b9%a0%e4%b8%8e%e4%bd%bf%e7%94%a8">性能分析工具的学习与使用</h1>
+<h2 id="%e9%82%b9%e6%b0%b8%e6%b5%a9">邹永浩</h2>
+<h2 id="2019211168">2019211168</h2>
+<h3 id="1-graph500-%e7%9a%84%e4%bd%bf%e7%94%a8">1. Graph500 的使用</h3>
+<p>在官网下载graph500之后，直接<code>make</code>即可编译出<code>graph500_reference_bfs</code>和<code>graph500_reference_bfs_sssp</code>，直接使用这两个程序即可。</p>
+<p>根据官网提供的数据,如下图所示</p>
+<img src="file:////home/zyh/Desktop/计算机系统性能测试/作业1/1.png" width="400px"/>
+<p>结合机器性能，参数设定为 SCALE &lt;= 26，EDGE FACTOR = 16 较为合理。</p>
+<h3 id="2-strace">2. strace</h3>
+<p><code>strace</code> 可以查看程序的系统调用，直接在程序调用前使用即可。</p>
+<pre><code class="language-bash"><div>strace graph500_reference_bfs 16 16
+</div></code></pre>
+<img src="file:////home/zyh/Desktop/计算机系统性能测试/作业1/2.png" width="600px"/>
+<p>可以看到系统调用的函数名，调用参数和返回值，如果有错误还可以看到简单的错误信息。</p>
+<h3 id="3-perf">3. perf</h3>
+<p><code>Ubuntu</code>下需要根据内核版本安装</p>
+<p><code>sudo apt install linux-tools-5.3.0-40-generic</code></p>
+<p><code>perf</code>的功能十分强大，不过有些指令需要相应内核和权限</p>
+<p><code>perf top</code> 可以实时显示性能统计信息</p>
+<img src="file:////home/zyh/Desktop/计算机系统性能测试/作业1/3.png" width="600px"/>
+<p><code>perf stat</code> 分析程序整体性能</p>
+<p><code>perf stat ./graph500_reference_bfs 20 16</code></p>
+<img src="file:////home/zyh/Desktop/计算机系统性能测试/作业1/4.png" width="600px"/>
+<h3 id="4-vmstat">4. vmstat</h3>
+<p><code>vmstat</code> 可以展现给定时间间隔的状态值,包括CPU使用率，内存使用，虚拟内存交换情况,IO读写情况。</p>
+<p>通过两个数字参数来完成的，第一个参数是采样的时间间隔数，单位是秒，第二个参数是采样的次数。</p>
+<img src="file:////home/zyh/Desktop/计算机系统性能测试/作业1/5.png" width="600px"/>
+<h3 id="5-dstat">5. dstat</h3>
+<p><code>dstat</code>也是一个性能统计工具，可以通过参数制定显示内容。</p>
+<img src="file:////home/zyh/Desktop/计算机系统性能测试/作业1/6.png" width="600px"/>
+<h3 id="6-free">6. free</h3>
+<p><code>free</code>命令可以显示当前系统未使用的和已使用的内存数目，还可以显示被内核使用的内存缓冲区。</p>
+<img src="file:////home/zyh/Desktop/计算机系统性能测试/作业1/7.png" width="600px"/>
+<p>可以看到开启程序后内存占用为3.3G。</p>
+<h3 id="7-iostat">7. iostat</h3>
+<p>iostat可以显示CPU和I/O系统的负载情况及分区状态信息。</p>
+<img src="file:////home/zyh/Desktop/计算机系统性能测试/作业1/8.png" width="600px"/>
+<h3 id="8-mpstat">8. mpstat</h3>
+<p><code>mpstat</code>用于获取 CPU 相关统计信息.</p>
+<img src="file:////home/zyh/Desktop/计算机系统性能测试/作业1/9.png" width="600px"/>
+<h3 id="9-nicstat">9. nicstat</h3>
+<p>nicstat可以统计网络流量</p>
+<img src="file:////home/zyh/Desktop/计算机系统性能测试/作业1/10.png" width="600px"/>
+    </body>
+    </html>
