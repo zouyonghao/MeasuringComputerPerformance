@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "algorithm": "cpp",
+        "array": "cpp",
+        "*.tcc": "cpp",
+        "time.h": "c",
+        "types.h": "c",
+        "intrin.h": "c",
+        "x86intrin.h": "c"
+    }
+}
