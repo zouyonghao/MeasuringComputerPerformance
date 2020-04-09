@@ -23,3 +23,7 @@ Measuring memory and cache throughput
 ## Hw6
 
 Proof of SSE = SSA + SST
+
+## Hw7
+
+Usage of mpiP
