@@ -1,2 +1,5 @@
 a.out
 *.o
+hw8/profile
+hw8/test
+hw8/gmon.out

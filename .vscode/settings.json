@@ -6,6 +6,12 @@
         "time.h": "c",
         "types.h": "c",
         "intrin.h": "c",
-        "x86intrin.h": "c"
+        "x86intrin.h": "c",
+        "libunwind-ptrace.h": "c",
+        "wait.h": "c",
+        "pthread.h": "c",
+        "unistd.h": "c",
+        "limits": "c",
+        "cstdlib": "c"
     }
 }
