@@ -12,6 +12,16 @@
         "pthread.h": "c",
         "unistd.h": "c",
         "limits": "c",
-        "cstdlib": "c"
+        "cstdlib": "c",
+        "syscall.h": "c",
+        "stdio.h": "c",
+        "fstream": "c",
+        "iosfwd": "c",
+        "istream": "c",
+        "sstream": "c",
+        "streambuf": "c",
+        "string.h": "c",
+        "cstdio": "c",
+        "stdlib.h": "c"
     }
 }
