@@ -63,7 +63,7 @@ int read(int fd, void *buf, size_t count)
 
     gettimeofday(&end, NULL);
     diff = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
-    printf("write time is %ld\n", diff);
+    printf("read time is %ld\n", diff);
     total_read_time += diff;
     return result;
 }
@@ -74,8 +74,8 @@ void print_statistics()
     printf("total write is %ld\n", total_write_count);
     printf("average read size is %f\n", (double)total_read_size / total_read_count);
     printf("average write size is %f\n", (double)total_write_size / total_write_count);
-    printf("total read time is %f\n", total_read_time / total_read_count);
-    printf("total write time is %f\n", total_write_time / total_write_count);
+    printf("average read time is %f\n", total_read_time / total_read_count);
+    printf("average write time is %f\n", total_write_time / total_write_count);
 }
 
 typedef void (*EXIT)(int status) __attribute__((noreturn));
