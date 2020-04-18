@@ -5,3 +5,4 @@ hw8/test
 hw8/gmon.out
 hw9/inject.so
 hw9/dump.rdb
+*.so

@@ -27,3 +27,15 @@ Proof of SSE = SSA + SST
 ## Hw7
 
 Usage of mpiP
+
+## Hw8
+
+Profile a program using sample method with libunwind (and ptrace).
+
+## Hw9
+
+IO profile and trace using LD_PRELOAD method
+
+## Hw10
+
+2-bit branch predict simulation with INTEL Pin.
