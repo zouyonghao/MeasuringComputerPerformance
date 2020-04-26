@@ -4,7 +4,8 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/home/zyh/pin-3.13/source/include"
+                "/home/zyh/pin-3.13/source/include",
+                "/usr/local/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",

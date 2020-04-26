@@ -1,7 +1,7 @@
 //
 // prime_sieve.c
 //
-// Copyright (C) July 2002, Tomás Oliveira e Silva
+// Copyright (C) July 2002, Tomï¿½s Oliveira e Silva
 //
 // e-mail: tos@det.ua.pt
 // www:    http://www.ieeta.pt/~tos
@@ -48,7 +48,8 @@
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <papi.h>
+#include <assert.h>
 
 //
 // configuration specification
@@ -57,37 +58,36 @@
 //
 
 #ifndef _implementation_
-# define _implementation_     0
+#define _implementation_ 0
 #endif
 #ifndef _sieve_bits_log2_
-# if _implementation_ == 0
-#  define _sieve_bits_log2_  25
-# else
-#  define _sieve_bits_log2_  19
-# endif
+#if _implementation_ == 0
+#define _sieve_bits_log2_ 25
+#else
+#define _sieve_bits_log2_ 19
+#endif
 #endif
 #ifndef _bucket_size_log2_
-# if _implementation_ == 0
-#  define _bucket_size_log2_ 20
-# else
-#  define _bucket_size_log2_ 10
-# endif
+#if _implementation_ == 0
+#define _bucket_size_log2_ 20
+#else
+#define _bucket_size_log2_ 10
+#endif
 #endif
 
 #if _implementation_ == 1
-# if _bucket_size_log2_ > 16
-#  error "_bucket_size_log2_ is too large"
-# endif
+#if _bucket_size_log2_ > 16
+#error "_bucket_size_log2_ is too large"
+#endif
 #endif
 
 //
 // basic type definitions
 //
 
-typedef unsigned char      u08;
-typedef unsigned int       u32;
+typedef unsigned char u08;
+typedef unsigned int u32;
 typedef unsigned long long u64;
-
 
 //
 // memory allocation
@@ -98,33 +98,31 @@ static void *get_memory(u32 size)
   u64 m;
 
   m = (u64)malloc(size + 255); // this assumes that sizeof(void *) = sizeof(u32)
-  if((void *)m == NULL)
+  if ((void *)m == NULL)
     exit(1);
   m = (m + 255) & ~255;
   return (void *)m; // pointer aligned on a 256 byte boundary
 }
 
-
 //
 // count the number of zeros
 //
 
-static u32 count_zero_bits(u08 *addr,u32 size)
+static u32 count_zero_bits(u08 *addr, u32 size)
 {
   static u32 data[256];
-  u32 i,j;
+  u32 i, j;
 
-  if(data[1] == 0)
-    for(i = 0;i < 256;i++)
-      for(j = i ^ 255;j;j >>= 1)
-        if(j & 1)
+  if (data[1] == 0)
+    for (i = 0; i < 256; i++)
+      for (j = i ^ 255; j; j >>= 1)
+        if (j & 1)
           data[i]++;
   j = 0;
-  for(i = 0;i < size;i++)
+  for (i = 0; i < size; i++)
     j += data[(u32)addr[i] & 255];
   return j;
 }
-
 
 //
 // generation of the (small) primes used by the main sieve
@@ -137,40 +135,40 @@ static u32 small_base;
 
 static void update_small_sieve(void)
 {
-  u32 i,j;
+  u32 i, j;
 
-  if(small_primes[0] == 0)
+  if (small_primes[0] == 0)
   { // initialize the small_primes array
-    for(j = 0;j < 1024;j++)
+    for (j = 0; j < 1024; j++)
       small_sieve[j] = 0;
-    for(i = 3;i < 256;i += 2)
-      if((small_sieve[i >> 6] & (1 << ((i >> 1) & 31))) == 0)
-        for(j = (i * i) >> 1;j < 32768;j += i)
+    for (i = 3; i < 256; i += 2)
+      if ((small_sieve[i >> 6] & (1 << ((i >> 1) & 31))) == 0)
+        for (j = (i * i) >> 1; j < 32768; j += i)
           small_sieve[j >> 5] |= 1 << (j & 31);
     j = 0;
-    for(i = 3;i < 65536;i += 2)
-      if((small_sieve[i >> 6] & (1 << ((i >> 1) & 31))) == 0)
+    for (i = 3; i < 65536; i += 2)
+      if ((small_sieve[i >> 6] & (1 << ((i >> 1) & 31))) == 0)
         small_primes[j++] = i;
-    if(j != number_of_small_primes)
+    if (j != number_of_small_primes)
       exit(2); // this should never happen
   }
-  for(j = 0;j < 1024;j++)
+  for (j = 0; j < 1024; j++)
     small_sieve[j] = 0;
-  for(i = 0;i < number_of_small_primes;i++)
+  for (i = 0; i < number_of_small_primes; i++)
   {
     j = small_primes[i] * small_primes[i];
-    if(j >= small_base + 65536)
+    if (j >= small_base + 65536)
       break;
-    if(j < small_base)
+    if (j < small_base)
     {
       j = small_base / small_primes[i];
       j *= small_primes[i];
-      if(j < small_base)
+      if (j < small_base)
         j += small_primes[i];
-      if((j & 1) == 0)
+      if ((j & 1) == 0)
         j += small_primes[i];
     }
-    for(j = (j - small_base) >> 1;j < 32768;j += small_primes[i])
+    for (j = (j - small_base) >> 1; j < 32768; j += small_primes[i])
       small_sieve[j >> 5] |= 1 << (j & 31);
   }
 }
@@ -205,7 +203,6 @@ static void test_small_sieve(void)
 
 #endif
 
-
 //
 // main sieve
 //
@@ -228,43 +225,63 @@ typedef struct bucket
   {
     u32 p; // prime
     u32 o; // the bit number of the first odd multiple (>= main_base) of the prime
-  }
-  data[primes_per_bucket];
-}
-bucket;
+  } data[primes_per_bucket];
+} bucket;
 
 static u32 main_sieve[1 << (_sieve_bits_log2_ - 5)];
-static u64 main_base,main_limit;
+static u64 main_base, main_limit;
 static u32 next_prime;
 
 #if _implementation_ == 0
 static bucket *main_list;
 #else
-static bucket **main_lists,*available_buckets;
-static u32 list_size_log2,current_list;
+static bucket **main_lists, *available_buckets;
+static u32 list_size_log2, current_list;
 #endif
 
 #if _implementation_ == 0
-# define new_bucket() do { bucket *b; b = get_memory(sizeof(bucket)); \
-    b->next = main_list; b->count = 0; main_list = b; } while(0)
+#define new_bucket()                \
+  do                                \
+  {                                 \
+    bucket *b;                      \
+    b = get_memory(sizeof(bucket)); \
+    b->next = main_list;            \
+    b->count = 0;                   \
+    main_list = b;                  \
+  } while (0)
 #else
-# define more_buckets() do { u32 i,j; i = 1 << (20 - _bucket_size_log2_); \
-    available_buckets = (bucket *)get_memory(i * sizeof(bucket)); for(j = 0;j < i;j++) \
-    available_buckets[j].next = (j < i - 1) ? &available_buckets[j + 1] : NULL; } while(0)
-# define new_bucket(k) do { bucket *b; if(available_buckets == NULL) more_buckets(); \
-    b = available_buckets; available_buckets = available_buckets->next; \
-    b->next = main_lists[k]; main_lists[k] = b; b->count = 0; } while(0)
+#define more_buckets()                                                            \
+  do                                                                              \
+  {                                                                               \
+    u32 i, j;                                                                     \
+    i = 1 << (20 - _bucket_size_log2_);                                           \
+    available_buckets = (bucket *)get_memory(i * sizeof(bucket));                 \
+    for (j = 0; j < i; j++)                                                       \
+      available_buckets[j].next = (j < i - 1) ? &available_buckets[j + 1] : NULL; \
+  } while (0)
+#define new_bucket(k)                            \
+  do                                             \
+  {                                              \
+    bucket *b;                                   \
+    if (available_buckets == NULL)               \
+      more_buckets();                            \
+    b = available_buckets;                       \
+    available_buckets = available_buckets->next; \
+    b->next = main_lists[k];                     \
+    main_lists[k] = b;                           \
+    b->count = 0;                                \
+  } while (0)
 #endif
 
 static void init_main_sieve(void)
 {
-  u64 t,end;
-  u32 i,j;
+  u64 t, end;
+  u32 i, j;
 #if _implementation_ == 1
   u32 k;
 #endif
 
-  if(next_prime == 0)
+  if (next_prime == 0)
   {
 #if _implementation_ == 0
     main_list = NULL;
@@ -272,12 +289,12 @@ static void init_main_sieve(void)
 #else
     i = 1 + (u32)ceil(sqrt((double)main_limit));
     i = 2 + (i >> _sieve_bits_log2_);
-    for(list_size_log2 = 2;(1 << list_size_log2) < i;list_size_log2++)
+    for (list_size_log2 = 2; (1 << list_size_log2) < i; list_size_log2++)
       ;
     current_list = 0;
     available_buckets = NULL;
     main_lists = (bucket **)get_memory((1 << list_size_log2) * sizeof(bucket *));
-    for(k = 0;k < (1 << list_size_log2);k++)
+    for (k = 0; k < (1 << list_size_log2); k++)
     {
       main_lists[k] = NULL;
       new_bucket(k);
@@ -288,35 +305,35 @@ static void init_main_sieve(void)
     next_prime = 3;
   }
   end = main_base + (u64)(2 << _sieve_bits_log2_);
-  while((t = (u64)next_prime * (u64)next_prime) < end)
+  while ((t = (u64)next_prime * (u64)next_prime) < end)
   {
-    if(next_prime >= small_base + 65536)
+    if (next_prime >= small_base + 65536)
     {
       small_base += 65536;
       update_small_sieve();
     }
     i = (next_prime - small_base) >> 1;
-    if((small_sieve[i >> 5] & (1 << (i & 31))) == 0)
+    if ((small_sieve[i >> 5] & (1 << (i & 31))) == 0)
     {
-      if(t < main_base)
+      if (t < main_base)
       {
         t = main_base / (u64)next_prime;
         t *= (u64)next_prime;
-        if(t < main_base)
+        if (t < main_base)
           t += (u64)next_prime;
-        if(((u32)t & 1) == 0)
+        if (((u32)t & 1) == 0)
           t += (u64)next_prime;
       }
       i = (u32)((t - main_base) >> 1); // bit number
 #if _implementation_ == 0
-      if(main_list->count == primes_per_bucket)
+      if (main_list->count == primes_per_bucket)
         new_bucket();
       j = main_list->count++;
       main_list->data[j].p = next_prime;
       main_list->data[j].o = i;
 #else
       k = (current_list + (i >> _sieve_bits_log2_)) & ((1 << list_size_log2) - 1);
-      if(main_lists[k]->count == primes_per_bucket)
+      if (main_lists[k]->count == primes_per_bucket)
         new_bucket(k);
       j = main_lists[k]->count++;
       main_lists[k]->data[j].p = next_prime;
@@ -332,33 +349,33 @@ static void do_main_sieve(void)
   bucket *b;
 #if _implementation_ == 1
   bucket *c;
-  u32 j,k;
+  u32 j, k;
 #endif
-  u32 i,p,o;
+  u32 i, p, o;
 
   init_main_sieve();
-  for(i = 0;i < (1 << (_sieve_bits_log2_ - 5));i++)
+  for (i = 0; i < (1 << (_sieve_bits_log2_ - 5)); i++)
     main_sieve[i] = 0;
 #if _implementation_ == 0
-  for(b = main_list;b != NULL;b = b->next)
-    for(i = 0;i < b->count;i++)
+  for (b = main_list; b != NULL; b = b->next)
+    for (i = 0; i < b->count; i++)
     {
       p = b->data[i].p;
-      for(o = b->data[i].o;o < (1 << _sieve_bits_log2_);o += p)
+      for (o = b->data[i].o; o < (1 << _sieve_bits_log2_); o += p)
         main_sieve[o >> 5] |= 1 << (o & 31);
       b->data[i].o = o - (1 << _sieve_bits_log2_);
     }
 #else
   b = main_lists[current_list];
-  while(b != NULL)
+  while (b != NULL)
   {
-    for(i = 0;i < b->count;i++)
+    for (i = 0; i < b->count; i++)
     {
       p = b->data[i].p;
-      for(o = b->data[i].o;o < (1 << _sieve_bits_log2_);o += p)
+      for (o = b->data[i].o; o < (1 << _sieve_bits_log2_); o += p)
         main_sieve[o >> 5] |= 1 << (o & 31);
       k = (current_list + (o >> _sieve_bits_log2_)) & ((1 << list_size_log2) - 1);
-      if(main_lists[k]->count == primes_per_bucket)
+      if (main_lists[k]->count == primes_per_bucket)
         new_bucket(k);
       j = main_lists[k]->count++;
       main_lists[k]->data[j].p = p;
@@ -380,9 +397,9 @@ static void do_main_sieve(void)
 static void test_main_sieve(void)
 {
 #define _test_main_sieve_
-#define _first_   0ull
-#define _last_    4ull
-#define _step_    1000000000ull
+#define _first_ 0ull
+#define _last_ 4ull
+#define _step_ 1000000000ull
 #define _init_pi_ 0ull
   u64 pi,i;
   u32 j,k;
@@ -423,15 +440,69 @@ static void test_main_sieve(void)
 
 #endif
 
-
 //
 // main program
 //
 
-int main(int argc,char **argv)
+int main(int argc, char **argv)
 {
+  /* Initialize the PAPI library */
+  if (PAPI_library_init(PAPI_VER_CURRENT) != PAPI_VER_CURRENT)
+    exit(1);
+  /* Create an EventSet */
+  int EventSet = PAPI_NULL;
+  int retval = PAPI_create_eventset(&EventSet);
+  assert(retval == PAPI_OK);
+
+  /* Total cycles */
+  retval = PAPI_add_event(EventSet, PAPI_TOT_CYC);
+  assert(retval == PAPI_OK);
+  /* Instructions completed */
+  retval = PAPI_add_event(EventSet, PAPI_TOT_INS);
+  assert(retval == PAPI_OK);
+
+  /* L1 cache miss */
+  retval = PAPI_add_event(EventSet, PAPI_L1_TCM);
+  assert(retval == PAPI_OK);
+  /* L1 cache access */
+  // retval = PAPI_add_event(EventSet, PAPI_L1_TCA);
+  // assert(retval == PAPI_OK);
+  /* L2 cache miss */
+  retval = PAPI_add_event(EventSet, PAPI_L2_TCM);
+  assert(retval == PAPI_OK);
+  /* L2 cache access */
+  retval = PAPI_add_event(EventSet, PAPI_L2_TCA);
+  assert(retval == PAPI_OK);
+  /* L3 cache miss */
+  retval = PAPI_add_event(EventSet, PAPI_L3_TCM);
+  assert(retval == PAPI_OK);
+  /* L3 cache access */
+  retval = PAPI_add_event(EventSet, PAPI_L3_TCA);
+  assert(retval == PAPI_OK);
+
+  /* TLB miss */
+  // retval = PAPI_add_event(EventSet, PAPI_TLB_TL);
+  // assert(retval == PAPI_OK);
+
+  /* branch mispredict */
+  retval = PAPI_add_event(EventSet, PAPI_BR_MSP);
+  assert(retval == PAPI_OK);
+  /* branch */
+  retval = PAPI_add_event(EventSet, PAPI_BR_CN);
+  assert(retval == PAPI_OK);
+
+  /* Start counting events */
+  if (PAPI_start(EventSet) != PAPI_OK)
+    retval = PAPI_start(EventSet);
+  assert(retval == PAPI_OK);
+
+  long long values1[9];
+  long long values2[9];
+  PAPI_read(EventSet, values1);
+  assert(retval == PAPI_OK);
+
   double t;
-  u32 i,j;
+  u32 i, j;
   u64 pi;
 
 #ifdef _test_small_sieve_
@@ -441,42 +512,42 @@ int main(int argc,char **argv)
   test_main_sieve();
 #endif
 
-  if(argc == 1)
+  if (argc == 1)
     i = 15;
   else
     i = atoi(argv[1]);
-  if(i < 6)
+  if (i < 6)
     i = 6;
-  if(i > 18)
+  if (i > 18)
     i = 18;
 
-  printf("%u %2u %2u",_implementation_,_sieve_bits_log2_,_bucket_size_log2_);
+  printf("%u %2u %2u", _implementation_, _sieve_bits_log2_, _bucket_size_log2_);
   main_base = 1ull;
-  for(j = 0;j < i;j++)
+  for (j = 0; j < i; j++)
     main_base *= 10ull;
   main_limit = main_base + 2000000000ull;
   next_prime = 0;
-  printf(" %2d",i);
+  printf(" %2d", i);
   t = (double)clock();
   init_main_sieve();
   t = ((double)clock() - t) / (double)CLOCKS_PER_SEC;
-  printf(" %6.2f",t);
+  printf(" %6.2f", t);
   j = 1 << (_sieve_bits_log2_ - 3);
   pi = 0ull;
   main_limit = main_base + 1000000000ull;
-  if(((u32)main_base | (u32)main_limit) & 63)
+  if (((u32)main_base | (u32)main_limit) & 63)
   {
-    fprintf(stderr,"Warning: prime number counts may be incorrect\n");
-    fprintf(stderr,"         main_base and main_limit should be multiples of 64\n");
+    fprintf(stderr, "Warning: prime number counts may be incorrect\n");
+    fprintf(stderr, "         main_base and main_limit should be multiples of 64\n");
   }
   t = (double)clock();
-  for(;;)
+  for (;;)
   {
     do_main_sieve();
     i = (u32)(main_limit - main_base) >> 4;
-    if(i <= j)
+    if (i <= j)
       break;
-    pi += (u64)count_zero_bits((u08 *)main_sieve,j);
+    pi += (u64)count_zero_bits((u08 *)main_sieve, j);
 #if 0
     //
     // example code to print the prime numbers between
@@ -492,12 +563,41 @@ int main(int argc,char **argv)
 #endif
     main_base += (u64)j << 4;
   }
-  pi += (u64)count_zero_bits((u08 *)main_sieve,i);
+  pi += (u64)count_zero_bits((u08 *)main_sieve, i);
   t = ((double)clock() - t) / (double)CLOCKS_PER_SEC;
-  printf(" %7.2f %8llu\n",t,pi);
+  printf(" %7.2f %8llu\n", t, pi);
+
+  /* Stop counting events */
+  retval = PAPI_stop(EventSet, values2);
+  assert(retval == PAPI_OK);
+
+  int index = 0;
+  printf("CPI: %f\n", (values2[index] - values1[index]) / 1.0 / (values2[index + 1] - values1[index + 1]));
+  index += 2;
+  printf("L1 cache miss: %lld\n", (values2[index] - values1[index]));
+  index++;
+  printf("L2 cache miss rate: %f\n", (values2[index] - values1[index]) / 1.0 / (values2[index + 1] - values1[index + 1]));
+  index += 2;
+  printf("L3 cache miss rate: %f\n", (values2[index] - values1[index]) / 1.0 / (values2[index + 1] - values1[index + 1]));
+
+  // printf("TLB cache miss: %lld\n", (values2[8] - values1[8]));
+
+  index += 2;
+  printf("Branch miss prediction rate: %f\n", (values2[index] - values1[index]) / 1.0 / (values2[index + 1] - values1[index + 1]));
+
+  /* Clean up EventSet */
+  if (PAPI_cleanup_eventset(EventSet) != PAPI_OK)
+    exit(-1);
+
+  /* Destroy the EventSet */
+  if (PAPI_destroy_eventset(&EventSet) != PAPI_OK)
+    exit(-1);
+
+  /* Shutdown PAPI */
+  PAPI_shutdown();
+
   return 0;
 }
-
 
 //
 // speed measurements on an 900MHz Athlon (64k two-way L1 data cache)

@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.world": "xml",
         "algorithm": "cpp",
         "array": "cpp",
         "*.tcc": "cpp",
@@ -60,6 +61,8 @@
         "ostream": "cpp",
         "stdexcept": "cpp",
         "cinttypes": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "assert.h": "c",
+        "papi.h": "c"
     }
 }
