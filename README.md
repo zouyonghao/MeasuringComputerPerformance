@@ -40,6 +40,10 @@ IO profile and trace using LD_PRELOAD method
 
 2-bit branch predict simulation with INTEL Pin.
 
-## hw11
+## Hw11
 
 usage of perf and PAPI
+
+## Hw12
+
+Measuring memory throughput with Stream.
